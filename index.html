@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WebGIS Sebaran SMA Kabupaten Muara Enim</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+background:linear-gradient(
+135deg,
+#dff6ff,
+#cce7ff,
+#eaf8ff
+);
+min-height:100vh;
+}
+
+/* =======================
+HEADER
+======================= */
+
+.hero{
+padding:50px 20px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+}
+
+.card{
+background:rgba(255,255,255,0.9);
+backdrop-filter:blur(10px);
+border-radius:30px;
+padding:35px;
+box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+.decor{
+text-align:center;
+font-size:40px;
+margin-bottom:15px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:30px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.foto{
+width:230px;
+height:230px;
+border-radius:50%;
+object-fit:cover;
+border:6px solid #8fd3ff;
+box-shadow:0 0 25px rgba(143,211,255,0.7);
+}
+
+.identitas{
+flex:1;
+min-width:280px;
+}
+
+.identitas h1{
+color:#4a90e2;
+margin-bottom:20px;
+font-size:32px;
+}
+
+.identitas p{
+font-size:18px;
+margin-bottom:10px;
+color:#444;
+}
+
+.deskripsi{
+margin-top:25px;
+line-height:1.9;
+text-align:justify;
+color:#444;
+font-size:16px;
+}
+
+.btn{
+display:inline-block;
+margin-top:20px;
+padding:15px 28px;
+border-radius:50px;
+background:linear-gradient(
+90deg,
+#8fd3ff,
+#6cb7ff
+);
+text-decoration:none;
+color:white;
+font-weight:bold;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:translateY(-3px);
+}
+
+/* =======================
+MAP
+======================= */
+
+.judul-peta{
+text-align:center;
+padding:30px;
+font-size:30px;
+font-weight:bold;
+color:#4a90e2;
+}
+
+#map{
+height:650px;
+margin:0 20px;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* =======================
+FOOTER
+======================= */
+
+.footer{
+margin-top:30px;
+padding:20px;
+background:#8fd3ff;
+color:white;
+text-align:center;
+font-weight:bold;
+}
+
+.leaflet-popup-content{
+font-size:15px;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+
+<div class="container">
+
+<div class="card">
+
+<div class="decor">
+💙 🌷 🧸 🌷 💙
+</div>
+
+<div class="header">
+
+<img src="asset/WhatsApp Image 2026-06-12 at 11.15.00.jpeg" class="foto">
+
+<div class="identitas">
+
+<h1>
+💙 WebGIS Sebaran SMA Kabupaten Muara Enim 💙
+</h1>
+
+<p>🌷 <b>Nama :</b> Intan Nur Suci Rahmadhani</p>
+
+<p>🧸 <b>NPM :</b> 2313034030</p>
+
+<p>💙 <b>Program Studi :</b> Pendidikan Geografi</p>
+
+<a href="#map" class="btn">
+🗺️ Lihat Peta Interaktif
+</a>
+
+</div>
+
+</div>
+
+<div class="deskripsi">
+
+<p>
+Peta sebaran SMA di Kabupaten Muara Enim menggambarkan lokasi sekolah menengah atas yang tersebar di setiap kecamatan. Persebaran sekolah cenderung lebih banyak berada di wilayah dengan jumlah penduduk tinggi dan akses transportasi yang baik, seperti Muara Enim dan Lawang Kidul.
+</p>
+
+<br>
+
+<p>
+Sementara itu, daerah yang jauh dari pusat perkembangan wilayah memiliki jumlah SMA yang lebih sedikit. Peta ini menunjukkan tingkat pemerataan fasilitas pendidikan di Kabupaten Muara Enim serta membantu mengetahui wilayah yang masih memerlukan penambahan sarana pendidikan.
+</p>
+
+<br>
+
+<p>
+Selain itu, peta sebaran SMA dapat digunakan sebagai bahan perencanaan pembangunan pendidikan agar akses sekolah lebih merata bagi masyarakat. 💙🌷🧸
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<div class="judul-peta">
+🗺️ Sebaran SMA Kabupaten Muara Enim 🗺️
+</div>
+
+<div id="map"></div>
+
+<div class="footer">
+💙 Pendidikan Geografi Universitas Lampung 💙
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+var map = L.map('map').setView([-3.68,103.78],11);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+attribution:'© OpenStreetMap'
+}
+).addTo(map);
+
+fetch('data/untitled(2).geojson')
+
+.then(response => response.json())
+
+.then(data => {
+
+var smaLayer = L.geoJSON(data,{
+
+pointToLayer:function(feature,latlng){
+
+return L.marker(latlng);
+
+},
+
+onEachFeature:function(feature,layer){
+
+var nama =
+feature.properties.name ||
+feature.properties.NAMA ||
+"Data SMA";
+
+layer.bindPopup(`
+<div>
+🧸 <b>${nama}</b><br>
+💙 Kabupaten Muara Enim
+</div>
+`);
+
+}
+
+}).addTo(map);
+
+map.fitBounds(smaLayer.getBounds());
+
+})
+
+.catch(error => {
+
+console.log(error);
+
+alert("Data GeoJSON tidak ditemukan 😭");
+
+});
+
+</script>
+
+</body>
+</html>
